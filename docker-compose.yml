@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    # Ollama API доступен только локально на сервере для безопасности
+    ports:
+      - "127.0.0.1:11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_KEEP_ALIVE=30m
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mcp-llm-courts
+    restart: unless-stopped
+    depends_on:
+      - ollama
+    # Публикуем веб-интерфейс наружу на 8000 (VPN-доступ к 10.0.61.88:8000)
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # App обращается к LLM через сервисное имя ollama во внутренней сети compose
+      - OLLAMA_BASE_URL=http://ollama:11434
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ollama_models:

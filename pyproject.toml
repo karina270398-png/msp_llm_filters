@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-llm-courts"
+version = "0.1.0"
+description = "MCP server wrapper for court cases API"
+requires-python = ">=3.10"
+readme = "README.md"
+authors = [
+  { name = "Your Name" }
+]
+license = { text = "MIT" }
+dependencies = [
+  "mcp>=0.3.0",
+  "pydantic>=2.6",
+  "httpx>=0.27",
+  "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "ruff>=0.5",
+  "pytest>=8.0",
+]
+
+[project.scripts]
+mcp-llm-courts = "mcp_llm_courts.server:main_entry"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
